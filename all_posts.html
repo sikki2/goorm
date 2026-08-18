@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전체 게시물 성과 목록</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 아이콘 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body { font-family: 'Pretendard', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6 md:p-10">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- 상단 헤더 -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">📊 전체 게시물 성과 상세</h1>
+                <p class="text-sm text-gray-500 mt-1">탭을 이동하여 릴스와 카드뉴스 성과를 나누어 확인해보세요.</p>
+            </div>
+            <button onclick="window.close()" class="px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition text-sm">
+                <i class="fa-solid fa-xmark mr-1"></i> 창 닫기
+            </button>
+        </div>
+
+        <!-- 📌 릴스 / 카드뉴스 탭 스위치 버튼 -->
+        <div class="flex space-x-2 mb-4 border-b border-gray-200">
+            <button id="tabReelsBtn" onclick="switchTab('reels')" class="px-5 py-2.5 font-bold text-sm rounded-t-lg border-b-2 border-indigo-600 text-indigo-600 bg-white shadow-sm transition flex items-center">
+                <i class="fa-solid fa-clapperboard mr-2"></i> 🎬 릴스 성과
+            </button>
+            <button id="tabCardBtn" onclick="switchTab('card')" class="px-5 py-2.5 font-bold text-sm rounded-t-lg border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition flex items-center">
+                <i class="fa-solid fa-images mr-2"></i> 🖼️ 카드뉴스 DB
+            </button>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 🎬 [1. 릴스 성과 영역 (35개 데이터 전체 보존)] -->
+        <!-- ========================================================= -->
+        <div id="reelsSection" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse whitespace-nowrap">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-500 text-sm border-b border-gray-100 select-none">
+                            <th onclick="sortTable(0, 'reels')" class="px-6 py-4 font-semibold cursor-pointer hover:bg-gray-100 transition">
+                                콘텐츠 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(1, 'reels')" class="px-6 py-4 font-semibold cursor-pointer hover:bg-gray-100 transition">
+                                업로드 날짜 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(2, 'reels')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition text-indigo-600">
+                                조회수 <i class="fa-solid fa-sort-down text-xs ml-1"></i>
+                            </th>
+                            <th onclick="sortTable(3, 'reels')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition">
+                                도달 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(4, 'reels')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition">
+                                좋아요 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(5, 'reels')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition">
+                                댓글 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(6, 'reels')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition">
+                                공유 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(7, 'reels')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition">
+                                저장 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(8, 'reels')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition">
+                                평균 조회 시간 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-gray-100" id="reelsTbody">
+                        
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p1.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">옆자리 인턴 뭐하는지 보기 4일차</span></td><td class="px-6 py-4 text-gray-500">2026.07.27</td><td class="px-6 py-4 text-right font-medium">126,632</td><td class="px-6 py-4 text-right font-medium">81,488</td><td class="px-6 py-4 text-right font-medium">199</td><td class="px-6 py-4 text-right font-medium">8</td><td class="px-6 py-4 text-right font-medium">247</td><td class="px-6 py-4 text-right font-medium">48</td><td class="px-6 py-4 text-right font-medium">0:11</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p2.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">옆자리 인턴 뭐하는지 보기 3일차</span></td><td class="px-6 py-4 text-gray-500">2026.07.24</td><td class="px-6 py-4 text-right font-medium">51,090</td><td class="px-6 py-4 text-right font-medium">34,739</td><td class="px-6 py-4 text-right font-medium">37</td><td class="px-6 py-4 text-right font-medium">4</td><td class="px-6 py-4 text-right font-medium">29</td><td class="px-6 py-4 text-right font-medium">13</td><td class="px-6 py-4 text-right font-medium">0:08</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p3.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">옆자리 인턴 뭐하는지 보기 2일차</span></td><td class="px-6 py-4 text-gray-500">2026.07.22</td><td class="px-6 py-4 text-right font-medium">32,750</td><td class="px-6 py-4 text-right font-medium">24,598</td><td class="px-6 py-4 text-right font-medium">131</td><td class="px-6 py-4 text-right font-medium">6</td><td class="px-6 py-4 text-right font-medium">273</td><td class="px-6 py-4 text-right font-medium">31</td><td class="px-6 py-4 text-right font-medium">0:08</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p4.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">AI 캠퍼스 프리즘 개강일기1탄</span></td><td class="px-6 py-4 text-gray-500">2026.08.12</td><td class="px-6 py-4 text-right font-medium">433</td><td class="px-6 py-4 text-right font-medium">346</td><td class="px-6 py-4 text-right font-medium">14</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">0:09</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p5.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">앞자리 인턴 놀리기 1일차</span></td><td class="px-6 py-4 text-gray-500">2026.08.03</td><td class="px-6 py-4 text-right font-medium">23,588</td><td class="px-6 py-4 text-right font-medium">16,942</td><td class="px-6 py-4 text-right font-medium">28</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">18</td><td class="px-6 py-4 text-right font-medium">5</td><td class="px-6 py-4 text-right font-medium">0:07</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p6.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">대표님이 성과가 안보인다고 했을때 팀장님 모습</span></td><td class="px-6 py-4 text-gray-500">2026.08.01</td><td class="px-6 py-4 text-right font-medium">2,607</td><td class="px-6 py-4 text-right font-medium">1,865</td><td class="px-6 py-4 text-right font-medium">16</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">3</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0:05</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p7.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">손가락을 움직여보세요</span></td><td class="px-6 py-4 text-gray-500">2026.07.31</td><td class="px-6 py-4 text-right font-medium">1,309</td><td class="px-6 py-4 text-right font-medium">1,145</td><td class="px-6 py-4 text-right font-medium">8</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">0:03</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p8.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">옆자리 인턴 뭐하는지 보기 5.5일차</span></td><td class="px-6 py-4 text-gray-500">2026.07.31</td><td class="px-6 py-4 text-right font-medium">2,929</td><td class="px-6 py-4 text-right font-medium">2,313</td><td class="px-6 py-4 text-right font-medium">10</td><td class="px-6 py-4 text-right font-medium">3</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">0:06</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p9.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">괜히 머쓱할때</span></td><td class="px-6 py-4 text-gray-500">2026.07.30</td><td class="px-6 py-4 text-right font-medium">7,462</td><td class="px-6 py-4 text-right font-medium">5,685</td><td class="px-6 py-4 text-right font-medium">26</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">26</td><td class="px-6 py-4 text-right font-medium">5</td><td class="px-6 py-4 text-right font-medium">0:07</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p10.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">옆자리 인턴 뭐하는지 보기 5일차</span></td><td class="px-6 py-4 text-gray-500">2026.07.29</td><td class="px-6 py-4 text-right font-medium">8,298</td><td class="px-6 py-4 text-right font-medium">6,394</td><td class="px-6 py-4 text-right font-medium">25</td><td class="px-6 py-4 text-right font-medium">3</td><td class="px-6 py-4 text-right font-medium">15</td><td class="px-6 py-4 text-right font-medium">3</td><td class="px-6 py-4 text-right font-medium">0:07</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p.11.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">판교 인턴의 하루</span></td><td class="px-6 py-4 text-gray-500">2026.07.29</td><td class="px-6 py-4 text-right font-medium">2,300</td><td class="px-6 py-4 text-right font-medium">1,775</td><td class="px-6 py-4 text-right font-medium">22</td><td class="px-6 py-4 text-right font-medium">3</td><td class="px-6 py-4 text-right font-medium">22</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">0:08</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p12.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">탭탭이</span></td><td class="px-6 py-4 text-gray-500">2026.07.27</td><td class="px-6 py-4 text-right font-medium">2,014</td><td class="px-6 py-4 text-right font-medium">1,730</td><td class="px-6 py-4 text-right font-medium">11</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">3</td><td class="px-6 py-4 text-right font-medium">0:04</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p13.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">수제 스퀴시</span></td><td class="px-6 py-4 text-gray-500">2026.07.25</td><td class="px-6 py-4 text-right font-medium">2,327</td><td class="px-6 py-4 text-right font-medium">2,014</td><td class="px-6 py-4 text-right font-medium">11</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">5</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0:06</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p14.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">보물찾기 이벤트</span></td><td class="px-6 py-4 text-gray-500">2026.07.24</td><td class="px-6 py-4 text-right font-medium">1,431</td><td class="px-6 py-4 text-right font-medium">1,173</td><td class="px-6 py-4 text-right font-medium">10</td><td class="px-6 py-4 text-right font-medium">4</td><td class="px-6 py-4 text-right font-medium">3</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">0:04</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p15.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">회사에서 메챠카멜레온 즐기기</span></td><td class="px-6 py-4 text-gray-500">2026.07.23</td><td class="px-6 py-4 text-right font-medium">2,113</td><td class="px-6 py-4 text-right font-medium">1,721</td><td class="px-6 py-4 text-right font-medium">15</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">4</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">0:04</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p16.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">사고방식을 바꾸세요</span></td><td class="px-6 py-4 text-gray-500">2026.07.23</td><td class="px-6 py-4 text-right font-medium">728</td><td class="px-6 py-4 text-right font-medium">612</td><td class="px-6 py-4 text-right font-medium">8</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">0:02</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p17.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">릴스 만들기 귀찮은데 그냥 프리즘 신청하면 안됨?</span></td><td class="px-6 py-4 text-gray-500">2026.08.13</td><td class="px-6 py-4 text-right font-medium">2,349</td><td class="px-6 py-4 text-right font-medium">1,799</td><td class="px-6 py-4 text-right font-medium">18</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">0:04</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p18.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">옆자리 인턴 뭐하는지 보기 1일차</span></td><td class="px-6 py-4 text-gray-500">2026.07.17</td><td class="px-6 py-4 text-right font-medium">17,059</td><td class="px-6 py-4 text-right font-medium">12,760</td><td class="px-6 py-4 text-right font-medium">19</td><td class="px-6 py-4 text-right font-medium">19</td><td class="px-6 py-4 text-right font-medium">15</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">0:07</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p19.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">진지하게 회의하는 우리</span></td><td class="px-6 py-4 text-gray-500">2026.07.16</td><td class="px-6 py-4 text-right font-medium">3,555</td><td class="px-6 py-4 text-right font-medium">2,685</td><td class="px-6 py-4 text-right font-medium">26</td><td class="px-6 py-4 text-right font-medium">5</td><td class="px-6 py-4 text-right font-medium">16</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">0:06</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p20.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">날지는 못해서 달려서라도 홍보하는 나</span></td><td class="px-6 py-4 text-gray-500">2026.07.15</td><td class="px-6 py-4 text-right font-medium">2,257</td><td class="px-6 py-4 text-right font-medium">1,711</td><td class="px-6 py-4 text-right font-medium">14</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">26</td><td class="px-6 py-4 text-right font-medium">12</td><td class="px-6 py-4 text-right font-medium">0:04</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p21.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">회의 시간에 팀장님이 갑자기 지나갈때</span></td><td class="px-6 py-4 text-gray-500">2026.07.14</td><td class="px-6 py-4 text-right font-medium">5,730</td><td class="px-6 py-4 text-right font-medium">4,142</td><td class="px-6 py-4 text-right font-medium">25</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">12</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0:06</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p22.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">직무 역량을 찾아보세요</span></td><td class="px-6 py-4 text-gray-500">2026.07.14</td><td class="px-6 py-4 text-right font-medium">574</td><td class="px-6 py-4 text-right font-medium">470</td><td class="px-6 py-4 text-right font-medium">3</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0:04</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p23.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">수제 키캡 만들어서 쓰는 나</span></td><td class="px-6 py-4 text-gray-500">2026.07.13</td><td class="px-6 py-4 text-right font-medium">2,042</td><td class="px-6 py-4 text-right font-medium">1,763</td><td class="px-6 py-4 text-right font-medium">14</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">3</td><td class="px-6 py-4 text-right font-medium">0:07</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p21.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">홀란 기대평 이벤트</span></td><td class="px-6 py-4 text-gray-500">2026.07.13</td><td class="px-6 py-4 text-right font-medium">542</td><td class="px-6 py-4 text-right font-medium">413</td><td class="px-6 py-4 text-right font-medium">8</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0:11</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p25.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">아이폰 기대평 이벤트</span></td><td class="px-6 py-4 text-gray-500">2026.07.10</td><td class="px-6 py-4 text-right font-medium">534</td><td class="px-6 py-4 text-right font-medium">403</td><td class="px-6 py-4 text-right font-medium">10</td><td class="px-6 py-4 text-right font-medium">4</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">0:04</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p26.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">사전 설명회 하트 홍보</span></td><td class="px-6 py-4 text-gray-500">2026.07.10</td><td class="px-6 py-4 text-right font-medium">719</td><td class="px-6 py-4 text-right font-medium">507</td><td class="px-6 py-4 text-right font-medium">6</td><td class="px-6 py-4 text-right font-medium">3</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">0:05</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p27.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">1,2,3,4 홍보</span></td><td class="px-6 py-4 text-gray-500">2026.07.09</td><td class="px-6 py-4 text-right font-medium">1,717</td><td class="px-6 py-4 text-right font-medium">1,333</td><td class="px-6 py-4 text-right font-medium">18</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">4</td><td class="px-6 py-4 text-right font-medium">0:05</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p28.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">사전 설명회 볼펜 홍보</span></td><td class="px-6 py-4 text-gray-500">2026.07.09</td><td class="px-6 py-4 text-right font-medium">672</td><td class="px-6 py-4 text-right font-medium">486</td><td class="px-6 py-4 text-right font-medium">8</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0:09</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p29.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">현직자 소환되는 춤</span></td><td class="px-6 py-4 text-gray-500">2026.07.09</td><td class="px-6 py-4 text-right font-medium">460</td><td class="px-6 py-4 text-right font-medium">305</td><td class="px-6 py-4 text-right font-medium">10</td><td class="px-6 py-4 text-right font-medium">7</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0:07</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p30.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">난 종이를 찢어서 홍보해</span></td><td class="px-6 py-4 text-gray-500">2026.07.08</td><td class="px-6 py-4 text-right font-medium">6,792</td><td class="px-6 py-4 text-right font-medium">5,470</td><td class="px-6 py-4 text-right font-medium">32</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">49</td><td class="px-6 py-4 text-right font-medium">58</td><td class="px-6 py-4 text-right font-medium">0:05</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p31.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">홍보 예산이 종이 한 장 남았을때</span></td><td class="px-6 py-4 text-gray-500">2026.07.07</td><td class="px-6 py-4 text-right font-medium">1,813</td><td class="px-6 py-4 text-right font-medium">1,307</td><td class="px-6 py-4 text-right font-medium">15</td><td class="px-6 py-4 text-right font-medium">3</td><td class="px-6 py-4 text-right font-medium">5</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">0:06</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p32.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">?에 들어갈 정답을 댓글로 달아주세요!</span></td><td class="px-6 py-4 text-gray-500">2026.07.06</td><td class="px-6 py-4 text-right font-medium">1,957</td><td class="px-6 py-4 text-right font-medium">1,456</td><td class="px-6 py-4 text-right font-medium">19</td><td class="px-6 py-4 text-right font-medium">6</td><td class="px-6 py-4 text-right font-medium">3</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0:05</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p33.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">7월 14일 문이 닫힙니다</span></td><td class="px-6 py-4 text-gray-500">2026.07.06</td><td class="px-6 py-4 text-right font-medium">442</td><td class="px-6 py-4 text-right font-medium">305</td><td class="px-6 py-4 text-right font-medium">11</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0:07</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p34.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">월드컵 릴스</span></td><td class="px-6 py-4 text-gray-500">2026.06.25</td><td class="px-6 py-4 text-right font-medium">638</td><td class="px-6 py-4 text-right font-medium">183</td><td class="px-6 py-4 text-right font-medium">14</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0</td><td class="px-6 py-4 text-right font-medium">0:07</td></tr>
+                        <tr class="hover:bg-gray-50 transition"><td class="px-6 py-4 flex items-center min-w-[280px]"><img src="./p35.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일"><span class="font-medium text-gray-900 truncate">검색기록 들켰다</span></td><td class="px-6 py-4 text-gray-500">2026.06.23</td><td class="px-6 py-4 text-right font-medium">1,429</td><td class="px-6 py-4 text-right font-medium">162</td><td class="px-6 py-4 text-right font-medium">14</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">2</td><td class="px-6 py-4 text-right font-medium">1</td><td class="px-6 py-4 text-right font-medium">0:05</td></tr>
+
+                        <!-- 📌 새로운 릴스는 기존처럼 여기에 <tr>...</tr> 계속 추가하시면 됩니다 -->
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 릴스 하단 페이지네이션 -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                <span id="reelsPageInfo" class="text-sm text-gray-500">계산 중...</span>
+                <div id="reelsPagination" class="flex items-center space-x-1"></div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 🖼️ [2. 카드뉴스 DB 영역 (새로 추가됨!)] -->
+        <!-- ========================================================= -->
+        <div id="cardSection" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse whitespace-nowrap">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-500 text-sm border-b border-gray-100 select-none">
+                            <th onclick="sortTable(0, 'card')" class="px-6 py-4 font-semibold cursor-pointer hover:bg-gray-100 transition">
+                                콘텐츠 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(1, 'card')" class="px-6 py-4 font-semibold cursor-pointer hover:bg-gray-100 transition">
+                                업로드 날짜 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(2, 'card')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition text-indigo-600">
+                                노출수 <i class="fa-solid fa-sort-down text-xs ml-1"></i>
+                            </th>
+                            <th onclick="sortTable(3, 'card')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition">
+                                도달 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(4, 'card')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition">
+                                좋아요 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(5, 'card')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition">
+                                댓글 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(6, 'card')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition">
+                                공유 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(7, 'card')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition">
+                                저장 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                            <th onclick="sortTable(8, 'card')" class="px-6 py-4 font-semibold text-right cursor-pointer hover:bg-gray-100 transition">
+                                슬라이드 장수 <i class="fa-solid fa-sort text-xs ml-1 text-gray-300"></i>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-gray-100" id="cardTbody">
+                        
+                        <!-- 📌 카드뉴스 샘플 데이터 (사진 이름을 c1.png, c2.png 등으로 사용하세요!) -->
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 flex items-center min-w-[280px]">
+                                <img src="./c1.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+                                <span class="font-medium text-gray-900 truncate">AI 캠퍼스 프리즘 사전설명회</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-500">2026.07.06</td>
+                            <td class="px-6 py-4 text-right font-medium">172</td>
+                            <td class="px-6 py-4 text-right font-medium">51</td>
+                            <td class="px-6 py-4 text-right font-medium">10</td>
+                            <td class="px-6 py-4 text-right font-medium">1</td>
+                            <td class="px-6 py-4 text-right font-medium">0</td>
+                            <td class="px-6 py-4 text-right font-medium">0</td>
+                            <td class="px-6 py-4 text-right font-medium">1장</td>
+                        </tr>
+
+                        <!-- 📌 새로운 카드뉴스는 여기에 아래 양식을 계속 붙여넣으시면 됩니다 -->
+
+                        <!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c2.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">0원으로 AI 스펙 쌓기</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.06</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">229</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">58</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">9</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">2장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c3.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">AI 부트캠프 구름에서 다 알려드립니다</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.07</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">190</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">53</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">9</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">3</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">6장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c4.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">친구 추천하고 특별 선물 받자!</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.08</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">187</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">72</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">8</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">1장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c5.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">네이버 pay 기대평 이벤트</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.10</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">209</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">61</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">10</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">4장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c6.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">소그룹 멘토링 스케줄</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.10</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">181</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">62</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">7</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">1장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c7.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">공룡 기대평 이벤트</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.13</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">207</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">67</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">10</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">2</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">1장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c8.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">카드뉴스 제목을 입력하세요</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.16</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">219</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">66</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">7</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">4장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c9.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">현직자 소그룹 멘토링 open</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.16</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">279</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">73</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">5</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">1장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c10.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">웹툰형 부트캠프 카듀뉴스</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.22</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">363</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">82</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">7</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">4장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c11.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">나 말고 다른 부트캠프 팔로우 했더라 잘살아</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.29</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">295</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">69</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">14</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">3</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">3장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c12.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">코를 보세요</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.13</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">149</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">41</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">9</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">2</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">1장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c13.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">3개과정 취업률 카드뉴스</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.14</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">210</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">60</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">7</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">3장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c14.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">AI 캠퍼스 프리즘 모집안내</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.16</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">158</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">62</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">7</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">05</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">1장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c15.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">구름 AI 캠퍼스 일정</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.20</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">324</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">87</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">6</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">2</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">1장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c16.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">구름 AI부트캠프 교육장 투어</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.20</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">417</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">96</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">2</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">6장</td>
+</tr>
+
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c17.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">AI시대, IT 생존 직무 TOP5</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.24</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">330</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">78</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">10</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">2</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">2</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">6장</td>
+</tr>
+
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c18.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">실무형 AI 엔지니어 되기</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.28</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">217</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">53</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">7</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">3</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">6장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c19.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">부트캠프 바로신청</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.28</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">207</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">42</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">7</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">1장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c20.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">구름 수료생의 빛나는 취업처를 공개합니다</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.30</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">207</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">48</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">12</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">5장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c21.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">AI 시대, 개발자 취준생 취업 성공 꿀팁</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.07.30</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">163</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">33</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">8</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">1장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c22.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">AI 캠퍼스 프리즘 1기 개강다짐 EVENT</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.08.07</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">257</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">80</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">22</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">7</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">2</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">3</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">4장</td>
+</tr>
+
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c23.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">구름 AI 캠퍼스 프리즘 친구 추천 이벤트</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.08.07</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">164</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">56</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">11</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">1장</td>
+</tr>
+
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c24.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">구름 ot 현장 스케치</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.08.12</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">132</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">54</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">16</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">1</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">10장</td>
+</tr>
+<!-- 📌 [카드뉴스 전용] 새 게시물 추가 1줄 양식 -->
+<tr class="hover:bg-gray-50 transition">
+    <td class="px-6 py-4 flex items-center min-w-[280px]">
+        <!-- 1. 썸네일 이미지 (VS Code에서 ./c2.png 입력) -->
+        <img src="./c25.png" class="w-12 h-12 object-cover rounded-lg mr-4 shrink-0" alt="썸네일">
+        <!-- 2. 카드뉴스 제목 -->
+        <span class="font-medium text-gray-900 truncate">역삼역 4번출구 맛집리스트 1탄</span>
+    </td>
+    <!-- 3. 업로드 날짜 -->
+    <td class="px-6 py-4 text-gray-500">2026.08.13</td>
+    <!-- 4. 노출수 -->
+    <td class="px-6 py-4 text-right font-medium">75</td>
+    <!-- 5. 도달 -->
+    <td class="px-6 py-4 text-right font-medium">34</td>
+    <!-- 6. 좋아요 -->
+    <td class="px-6 py-4 text-right font-medium">9</td>
+    <!-- 7. 댓글 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 8. 공유 -->
+    <td class="px-6 py-4 text-right font-medium">0</td>
+    <!-- 9. 저장 -->
+    <td class="px-6 py-4 text-right font-medium">2</td>
+    <!-- 10. 슬라이드 장수 -->
+    <td class="px-6 py-4 text-right font-medium">6장</td>
+</tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 카드뉴스 하단 페이지네이션 -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                <span id="cardPageInfo" class="text-sm text-gray-500">계산 중...</span>
+                <div id="cardPagination" class="flex items-center space-x-1"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ⚡ 탭 기억 / 정렬 / 페이지네이션 스마트 제어 스크립트 -->
+    <script>
+        // 📌 브라우저 메모리에 저장된 마지막 탭을 불러오고, 없으면 'reels'를 기본으로 엽니다.
+        let currentTab = localStorage.getItem('activeInstagramTab') || 'reels';
+
+        const state = {
+            reels: { page: 1, sortCol: 2, isAsc: false },
+            card: { page: 1, sortCol: 2, isAsc: false }
+        };
+        const itemsPerPage = 10;
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // 📌 클릭한 탭을 브라우저 메모리에 기억시킵니다!
+            localStorage.setItem('activeInstagramTab', tab);
+
+            const reelsSec = document.getElementById('reelsSection');
+            const cardSec = document.getElementById('cardSection');
+            const reelsBtn = document.getElementById('tabReelsBtn');
+            const cardBtn = document.getElementById('tabCardBtn');
+
+            if (tab === 'reels') {
+                reelsSec.classList.remove('hidden');
+                cardSec.classList.add('hidden');
+                reelsBtn.className = "px-5 py-2.5 font-bold text-sm rounded-t-lg border-b-2 border-indigo-600 text-indigo-600 bg-white shadow-sm transition flex items-center";
+                cardBtn.className = "px-5 py-2.5 font-bold text-sm rounded-t-lg border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition flex items-center";
+            } else {
+                reelsSec.classList.add('hidden');
+                cardSec.classList.remove('hidden');
+                cardBtn.className = "px-5 py-2.5 font-bold text-sm rounded-t-lg border-b-2 border-indigo-600 text-indigo-600 bg-white shadow-sm transition flex items-center";
+                reelsBtn.className = "px-5 py-2.5 font-bold text-sm rounded-t-lg border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition flex items-center";
+            }
+            renderPagination(tab);
+        }
+
+        function getValue(row, colIndex) {
+            const text = row.children[colIndex].innerText.trim();
+            if (colIndex === 0) return text;
+            if (colIndex === 1) return parseInt(text.replace(/\./g, ''), 10) || 0;
+            if (colIndex === 8) {
+                if (text.includes(':')) {
+                    const parts = text.split(':');
+                    return (parseInt(parts[0], 10) || 0) * 60 + (parseInt(parts[1], 10) || 0);
+                }
+                return parseInt(text.replace(/[^0-9]/g, ''), 10) || 0;
+            }
+            return parseInt(text.replace(/[^0-9]/g, ''), 10) || 0;
+        }
+
+        function renderPagination(tab) {
+            const tbody = document.getElementById(tab + 'Tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const totalItems = rows.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+            if (state[tab].page > totalPages) state[tab].page = totalPages;
+            if (state[tab].page < 1) state[tab].page = 1;
+
+            rows.forEach((row, index) => {
+                const start = (state[tab].page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                row.style.display = (index >= start && index < end) ? '' : 'none';
+            });
+
+            const startNum = totalItems > 0 ? (state[tab].page - 1) * itemsPerPage + 1 : 0;
+            const endNum = Math.min(state[tab].page * itemsPerPage, totalItems);
+            document.getElementById(tab + 'PageInfo').innerText = `전체 ${totalItems}개 중 ${startNum}-${endNum} 표시`;
+
+            const container = document.getElementById(tab + 'Pagination');
+            let html = `
+                <button onclick="changePage('${tab}', ${state[tab].page - 1})" ${state[tab].page === 1 ? 'disabled class="px-3 py-1 text-sm bg-gray-100 text-gray-400 cursor-not-allowed rounded"' : 'class="px-3 py-1 text-sm bg-white hover:bg-gray-100 text-gray-700 border border-gray-200 rounded transition"'}>
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                </button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === state[tab].page) {
+                    html += `<button class="px-3 py-1 text-sm bg-indigo-600 text-white font-bold rounded shadow-sm">${i}</button>`;
+                } else {
+                    html += `<button onclick="changePage('${tab}', ${i})" class="px-3 py-1 text-sm bg-white hover:bg-gray-100 text-gray-700 border border-gray-200 rounded transition">${i}</button>`;
+                }
+            }
+
+            html += `
+                <button onclick="changePage('${tab}', ${state[tab].page + 1})" ${state[tab].page === totalPages ? 'disabled class="px-3 py-1 text-sm bg-gray-100 text-gray-400 cursor-not-allowed rounded"' : 'class="px-3 py-1 text-sm bg-white hover:bg-gray-100 text-gray-700 border border-gray-200 rounded transition"'}>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function changePage(tab, page) {
+            state[tab].page = page;
+            renderPagination(tab);
+        }
+
+        function sortTable(colIndex, tab) {
+            const tbody = document.getElementById(tab + 'Tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const thList = document.querySelectorAll(`#${tab}Section thead th`);
+
+            if (state[tab].sortCol === colIndex) {
+                state[tab].isAsc = !state[tab].isAsc;
+            } else {
+                state[tab].sortCol = colIndex;
+                state[tab].isAsc = false;
+            }
+
+            rows.sort((rowA, rowB) => {
+                const valA = getValue(rowA, colIndex);
+                const valB = getValue(rowB, colIndex);
+
+                if (typeof valA === 'string') {
+                    return state[tab].isAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                }
+                return state[tab].isAsc ? valA - valB : valB - valA;
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+
+            thList.forEach((th, index) => {
+                const icon = th.querySelector('i');
+                if (index === colIndex) {
+                    th.classList.add('text-indigo-600');
+                    if (icon) {
+                        icon.className = state[tab].isAsc ? 'fa-solid fa-sort-up text-xs ml-1' : 'fa-solid fa-sort-down text-xs ml-1';
+                    }
+                } else {
+                    th.classList.remove('text-indigo-600');
+                    if (icon) {
+                        icon.className = 'fa-solid fa-sort text-xs ml-1 text-gray-300';
+                    }
+                }
+            });
+
+            state[tab].page = 1;
+            renderPagination(tab);
+        }
+
+        // 📌 초기 실행 시 기억해둔 탭으로 열기
+        renderPagination('reels');
+        renderPagination('card');
+        switchTab(currentTab);
+    </script>
